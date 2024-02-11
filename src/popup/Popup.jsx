@@ -14,7 +14,7 @@ export const Popup = ({ testCount }) => {
     handleSubmit,
   } = useForm()
   const onSubmit = (data) => {
-    chrome.runtime.sendMessage({ type: 'addScore', data: { score: data.text } })
+    chrome.runtime.sendMessage({ type: 'addScore', data: { text: data.text } })
   }
 
   const minus = () => {
@@ -48,23 +48,15 @@ export const Popup = ({ testCount }) => {
 
   return (
     <main>
-      <div className="calc">
-        <button onClick={minus} disabled={count <= 0}>
-          -
-        </button>
-        {isLoading
-          && <label>{count}</label>
-        }
-        <button onClick={add}>+</button>
-      </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <textarea
-          onKeyUp={handleUserKeyPress}
+          // onKeyUp={handleUserKeyPress}
           {...register("text", { required: true })}
         />
         {errors.text?.type === "required" && (
           <p role="alert">Text is required</p>
         )}
+        <button onClick={handleSubmit(onSubmit)}>submit</button>
       </form>
     </main>
   )
