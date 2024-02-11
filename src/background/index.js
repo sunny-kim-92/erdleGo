@@ -10,6 +10,8 @@ console.log('background is running')
 // 🟨🟩⬛🟩🟩
 // 🟩🟩🟩🟩🟩
 
+
+// Launch IndexedDB
 let db;
 const dbRequest = indexedDB.open("database");
 dbRequest.onerror = (event) => {
@@ -29,21 +31,8 @@ dbRequest.onupgradeneeded = (event) => {
   objectStore.createIndex("date", "date", { unique: false });
 };
 
-chrome.runtime.onMessage.addListener((request) => {
-  if (request.type === 'addScore') {
-    parseScore(request.data.text)
-  }
 
-  if (request.type === 'getCount') {
-    let final = 0
-    chrome.storage.sync.get(['count'], (result) => {
-      console.log('background got fetch: ' + result.count)
-      final = result.count
-    })
-    return final
-  }
-})
-
+// Helpers
 function parseScore(text) {
   let fullArr = text.split(`\n`)
   let titleArr = fullArr[0].split(' ')
@@ -72,3 +61,11 @@ function insertScore(obj) {
     scoreObjectStore.add(obj);
   };
 }
+
+
+// Listener
+chrome.runtime.onMessage.addListener((request) => {
+  if (request.type === 'addScore') {
+    parseScore(request.data.text)
+  }
+})
