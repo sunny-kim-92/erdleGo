@@ -1,5 +1,5 @@
 // Helpers
-function parseScore(text) {
+export function parseScore(text) {
     if (text.indexOf('Wordle') != -1) {
         return parseWordle(text)
     } else if (text.indexOf('Connections') != -1) {
@@ -27,7 +27,9 @@ function parseScore(text) {
     } else if (text.indexOf('www.cinenerdle2.app') != -1) {
         return parseCine2Nerdle(text)
     } else if (text.indexOf('DailyDozenTrivia.com') != -1) {
-        return parseCine2Nerdle(text)
+        return parseDozen(text)
+    } else {
+        return 'error'
     }
 }
 
@@ -96,7 +98,6 @@ function parseImmaculateFooty(text) {
     let score = answerArr.length[4].charAt(0)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
-
 
     return {
         score: score,
@@ -273,7 +274,7 @@ function parseCine2Nerdle(text) {
 
     return {
         score: score,
-        game: 'costcodle',
+        game: 'cine2nerdle',
         date: gameNumber,
         graph: answerArr,
         misc: null,
@@ -291,10 +292,54 @@ function parseDozen(text) {
 
     return {
         score: score,
-        game: 'costcodle',
+        game: 'dozen',
         date: gameNumber,
         graph: answerArr,
         misc: misc,
         link: null
+    }
+}
+
+function convertDate(game, text) {
+    if (game == 'wordle') {
+        let date = new Date('2021-06-21')
+        date.setDate(date + text)
+    } else if (game == 'connections') {
+        let date = new Date('2023-06-12')
+        date.setDate(date + text)
+    } else if (game == 'immaculate_footy') {
+        let date = new Date('2023-08-19')
+        date.setDate(date + text)
+    } else if (game == 'immaculate_basketball_mens') {
+        let date = new Date('2023-07-26')
+        date.setDate(date + text)
+    } else if (game == 'immaculate_basketball_womens') {
+        let date = new Date('2023-08-14')
+        date.setDate(date + text)
+    } else if (game == 'immaculate_baseball') {
+        let date = new Date('2023-04-04')
+        date.setDate(date + text)
+    } else if (game == 'immaculate_football') {
+        let date = new Date('2023-07-20')
+        date.setDate(date + text)
+    } else if (game == 'immaculate_hockey') {
+        let date = new Date('2023-07-27')
+        date.setDate(date + text)
+    } else if (game == 'tradle') {
+        let date = new Date('2022-03-07')
+        date.setDate(date + text)
+    } else if (game == 'globle') {
+        let date = new Date(text)
+    } else if (game == 'pokedoku') {
+        let date = new Date(text)
+    } else if (game == 'costcodle') {
+        let date = new Date('2023-09-21')
+        date.setDate(date + text)
+    } else if (game == 'cine2nerdle') {
+        let date = new Date('2022-11-03')
+        date.setDate(date + text)
+    } else if (game == 'dozen') {
+        let date = new Date('2023-07-24')
+        date.setDate(date + text)
     }
 }

@@ -5,32 +5,15 @@ import './Popup.css'
 
 export const Popup = ({ testCount }) => {
   const [count, setCount] = useState(testCount || 0)
-  const [text, setText] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
   const link = 'https://github.com/guocaoyi/create-chrome-ext'
   const {
     register,
     formState: { errors },
     handleSubmit,
   } = useForm()
+  
   const onSubmit = (data) => {
     chrome.runtime.sendMessage({ type: 'addScore', data: { text: data.text } })
-  }
-
-  const minus = () => {
-    if (count > 0) {
-      setCount(count - 1)
-      sendCount(count - 1)
-    }
-  }
-
-  const add = () => {
-    setCount(count + 1)
-    sendCount(count + 1)
-  }
-
-  const sendCount = (newCount) => {
-    chrome.runtime.sendMessage({ type: 'setCount', data: { count: newCount } })
   }
 
   const handleUserKeyPress = (e) => {
@@ -41,7 +24,6 @@ export const Popup = ({ testCount }) => {
 
   useEffect(() => {
     chrome.storage.sync.get(['count'], (result) => {
-      console.log(result)
       setCount(result.count || 0)
     })
   }, [])
@@ -56,7 +38,7 @@ export const Popup = ({ testCount }) => {
         {errors.text?.type === "required" && (
           <p role="alert">Text is required</p>
         )}
-        <button onClick={handleSubmit(onSubmit)}>submit</button>
+        <button onClick={handleSubmit(onSubmit)}>Submit</button>
       </form>
     </main>
   )

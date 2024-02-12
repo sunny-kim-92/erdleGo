@@ -1,15 +1,5 @@
 console.log('background is running')
-// console.log('⬛'.codePointAt(0))
-// console.log('🟩'.codePointAt(0))
-// console.log('🟨'.codePointAt(0))
-// Wordle 966 5/6
-
-// ⬛🟩⬛⬛🟨
-// 🟨🟩⬛🟨⬛
-// 🟨🟩🟨⬛⬛
-// 🟨🟩⬛🟩🟩
-// 🟩🟩🟩🟩🟩
-
+import parseScore from './parser.js'
 
 // Launch IndexedDB
 let db;
@@ -25,26 +15,17 @@ dbRequest.onupgradeneeded = (event) => {
   const db = event.target.result;
 
   const objectStore = db.createObjectStore("scores", { keyPath: 'id', autoIncrement: true });
-
   objectStore.createIndex("game", "game", { unique: false });
-
   objectStore.createIndex("date", "date", { unique: false });
 };
 
 
 // Helpers
-function parseScore(text) {
-  let fullArr = text.split(`\n`)
-  let titleArr = fullArr[0].split(' ')
-  let gameNumber = titleArr[0]
-  let answerArr = fullArr.slice(2)
-  let score = answerArr.length
-  insertScore({
-    score: score,
-    game: 'wordle',
-    date: gameNumber,
-    graph: answerArr
-  })
+function calculateScore(text) {
+  let res = parseScore(text)
+  if (res != 'error') {
+    insertScore(res)
+  }
 }
 
 function insertScore(obj) {
@@ -66,6 +47,6 @@ function insertScore(obj) {
 // Listener
 chrome.runtime.onMessage.addListener((request) => {
   if (request.type === 'addScore') {
-    parseScore(request.data.text)
+    calculateScore(request.data.text)
   }
 })
