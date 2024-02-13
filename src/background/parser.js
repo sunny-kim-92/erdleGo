@@ -1,53 +1,65 @@
 // Helpers
 export function parseScore(text) {
+    let data = null
     if (text.indexOf('Wordle') != -1) {
-        return parseWordle(text)
+        data = parseWordle(text)
     } else if (text.indexOf('Connections') != -1) {
-        return parseConnections(text)
+        data = parseConnections(text)
     } else if (text.indexOf('https://www.immaculatefooty.com') != -1) {
-        return parseImmaculateFooty(text)
-    } else if (text.indexOf('https://www.immaculatefooty.com/basketball/mens') != -1) {
-        return parseImmaculateBasketballMens(text)
+        data = parseImmaculateFooty(text)
+    } else if (text.indexOf('https://immaculategrid.com/basketball/mens') != -1) {
+        data = parseImmaculateBasketballMens(text)
     } else if (text.indexOf('https://immaculategrid.com/basketball/womens') != -1) {
-        return parseImmaculateBasketballWomens(text)
+        data = parseImmaculateBasketballWomens(text)
     } else if (text.indexOf('https://immaculategrid.com/football') != -1) {
-        return parseImmaculateFootball(text)
+        data = parseImmaculateFootball(text)
     } else if (text.indexOf('https://immaculategrid.com/grid') != -1) {
-        return parseImmaculateBaseball(text)
-    } else if (text.indexOf('https://www.immaculatefooty.com/hockey') != -1) {
-        return parseImmaculateHockey(text)
+        data = parseImmaculateBaseball(text)
+    } else if (text.indexOf('https://immaculategrid.com/hockey') != -1) {
+        data = parseImmaculateHockey(text)
     } else if (text.indexOf('https://games.oec.world/en/tradle') != -1) {
-        return parseTradle(text)
+        data = parseTradle(text)
     } else if (text.indexOf('https://globle-game.com') != -1) {
-        return parseGloble(text)
+        data = parseGloble(text)
     } else if (text.indexOf('https://pokedoku.com') != -1) {
-        return parsePokedoku(text)
+        data = parsePokedoku(text)
     } else if (text.indexOf('https://costcodle.com') != -1) {
-        return parseCostcodle(text)
+        data = parseCostcodle(text)
     } else if (text.indexOf('www.cinenerdle2.app') != -1) {
-        return parseCine2Nerdle(text)
+        data = parseCine2Nerdle(text)
     } else if (text.indexOf('DailyDozenTrivia.com') != -1) {
-        return parseDozen(text)
+        data = parseDozen(text)
     } else {
         return 'error'
     }
+    if (data.score) {
+        data.score = parseInt(data.score)
+    } if (data.gameNumber) {
+        data.gameNumber = parseInt(data.gameNumber)
+    } if (data.misc) {
+        data.misc = parseInt(data.misc)
+    }
+    return data
 }
 
 function parseWordle(text) {
     let fullArr = text.split(`\n`)
     let titleArr = fullArr[0].split(' ')
 
-    let gameNumber = titleArr[0]
+    let gameNumber = titleArr[1]
     let answerArr = fullArr.slice(2)
     let score = answerArr.length
+    let date = convertDate('wordle', parseInt(gameNumber))
 
     return {
         score: score,
         game: 'wordle',
-        date: gameNumber,
+        gameNumber: gameNumber,
+        date: date,
         graph: answerArr,
         misc: null,
-        link: null
+        link: null,
+        slug: 'wordle:' + date
     }
 }
 
@@ -58,14 +70,17 @@ function parseConnections(text) {
     let gameNumber = titleArr[1].substring(1)
     let answerArr = fullArr.slice(2)
     let score = answerArr.length
+    let date = convertDate('connections', parseInt(gameNumber))
 
     return {
         score: score,
         game: 'connections',
-        date: gameNumber,
+        gameNumber: gameNumber,
+        date: date,
         graph: answerArr,
         misc: null,
-        link: null
+        link: null,
+        slug: 'connections:' + date
     }
 }
 
@@ -75,37 +90,44 @@ function parseImmaculateFooty(text) {
 
     let gameNumber = titleArr[3]
     let answerArr = fullArr.slice(3, 6)
-    let score = answerArr.length[4].charAt(0)
+    let score = titleArr[4].charAt(0)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
+    let date = convertDate('immaculate_footy', parseInt(gameNumber))
 
     return {
         score: score,
         game: 'immaculate_footy',
-        date: gameNumber,
+        gameNumber: gameNumber,
+        date: date,
         graph: answerArr,
         misc: rarity,
-        link: link
+        link: link,
+        slug: 'immaculate_footy:' + date
     }
 }
 
-function parseImmaculateFooty(text) {
+function parseImmaculateBasketballMens(text) {
     let fullArr = text.split(`\n`)
     let titleArr = fullArr[0].split(' ')
 
-    let gameNumber = titleArr[3]
+    let gameNumber = titleArr[4]
+    let score = titleArr[5].charAt(0)
     let answerArr = fullArr.slice(3, 6)
-    let score = answerArr.length[4].charAt(0)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
+    let date = convertDate('immaculate_basketball_mens', parseInt(gameNumber))
+
 
     return {
         score: score,
         game: 'immaculate_basketball_mens',
-        date: gameNumber,
+        gameNumber: gameNumber,
+        date: date,
         graph: answerArr,
         misc: rarity,
-        link: link
+        link: link,
+        slug: 'immaculate_basketball_mens:' + date
     }
 }
 
@@ -118,14 +140,17 @@ function parseImmaculateBasketballWomens(text) {
     let answerArr = fullArr.slice(3, 6)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
+    let date = convertDate('immaculate_basketball_womens', parseInt(gameNumber))
 
     return {
         score: score,
         game: 'immaculate_basketball_womens',
-        date: gameNumber,
+        date: date,
+        gameNumber: gameNumber,
         graph: answerArr,
         misc: rarity,
-        link: link
+        link: link,
+        slug: 'immaculate_basketball_womens:' + date
     }
 }
 
@@ -138,14 +163,18 @@ function parseImmaculateBaseball(text) {
     let answerArr = fullArr.slice(3, 6)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
+    let date = convertDate('immaculate_baseball', parseInt(gameNumber))
+
 
     return {
         score: score,
         game: 'immaculate_baseball',
-        date: gameNumber,
+        date: date,
+        gameNumber: gameNumber,
         graph: answerArr,
         misc: rarity,
-        link: link
+        link: link,
+        slug: 'immaculate_baseball:' + date
     }
 }
 
@@ -155,17 +184,20 @@ function parseImmaculateFootball(text) {
 
     let gameNumber = titleArr[3]
     let score = titleArr[4].charAt(0)
-    let answerArr = fullArr.slice(3, 6)
-    let rarity = fullArr[2].split(' ')[1]
-    let link = fullArr[7]
+    let answerArr = fullArr.slice(2, 5)
+    let rarity = fullArr[1].split(' ')[1]
+    let link = fullArr[6]
+    let date = convertDate('immaculate_football', parseInt(gameNumber))
 
     return {
         score: score,
         game: 'immaculate_football',
-        date: gameNumber,
+        gameNumber: gameNumber,
+        date: date,
         graph: answerArr,
         misc: rarity,
-        link: link
+        link: link,
+        slug: 'immaculate_football:' + date
     }
 }
 
@@ -175,17 +207,21 @@ function parseImmaculateHockey(text) {
 
     let gameNumber = titleArr[3]
     let score = titleArr[4].charAt(0)
-    let answerArr = fullArr.slice(3, 6)
-    let rarity = fullArr[2].split(' ')[1]
-    let link = fullArr[7]
+    let answerArr = fullArr.slice(2, 5)
+    let rarity = fullArr[1].split(' ')[1]
+    let link = fullArr[6]
+    let date = convertDate('immaculate_hockey', parseInt(gameNumber))
+
 
     return {
         score: score,
         game: 'immaculate_hockey',
-        date: gameNumber,
+        gameNumber: gameNumber,
+        date: date,
         graph: answerArr,
         misc: rarity,
-        link: link
+        link: link,
+        slug: 'immaculate_hockey:' + date
     }
 }
 
@@ -194,17 +230,21 @@ function parseTradle(text) {
     let titleArr = fullArr[0].split(' ')
 
     let gameNumber = titleArr[1].slice(1)
-    let score = titleArr[2].charAt(0)
+    let score = titleArr[2].split('/')[0]
+    if (score == 'X') score = 0
     let answerArr = fullArr.slice(1, fullArr.length - 1)
     let link = fullArr[fullArr.length - 1]
+    let date = convertDate('tradle', parseInt(gameNumber))
 
     return {
         score: score,
         game: 'tradle',
-        date: gameNumber,
+        gameNumber: gameNumber,
+        date: date,
         graph: answerArr,
         misc: null,
-        link: link
+        link: link,
+        slug: 'tradle:' + date
     }
 }
 
@@ -212,7 +252,7 @@ function parseGloble(text) {
     let fullArr = text.split(`\n`)
     let titleArr = fullArr[0].split(' ')
 
-    let gameNumber = titleArr.slice(1, 4).join(' ')
+    let date = convertDate('globle', titleArr.slice(1, 4).join(' '))
     let score = fullArr[2].split(' ')[2]
     let answerArr = fullArr[2].split(' ')[0]
     let link = fullArr[4]
@@ -220,47 +260,53 @@ function parseGloble(text) {
     return {
         score: score,
         game: 'globle',
-        date: gameNumber,
+        date: date,
         graph: answerArr,
         misc: null,
-        link: link
+        link: link,
+        slug: 'globle:' + date
     }
 }
 
 function parsePokedoku(text) {
     let fullArr = text.split(`\n`)
 
-    let gameNumber = fullArr[1]
+    let date = fullArr[1]
     let score = fullArr[3].split(' ')[1].charAt(0)
     let answerArr = fullArr.slice(6, 9)
     let rarity = fullArr[4].split(' ')[1].split('/')[0]
-    let link = 'https://pokedoku.com/' + gameNumber
+    let link = 'https://pokedoku.com/' + date
 
     return {
         score: score,
         game: 'pokedoku',
-        date: gameNumber,
+        date: date,
         graph: answerArr,
         misc: rarity,
-        link: link
+        link: link,
+        slug: 'pokedoku:' + date
     }
 }
 
 function parseCostcodle(text) {
     let fullArr = text.split(`\n`)
-    let titleArr = fullArr[0]
+    let titleArr = fullArr[0].split(' ')
 
-    let gameNumber = titleArr.split(' ')[1].slice(1)
-    let score = titleArr.splice(' ')[2].charAt(0)
-    let answerArr = fullArr[1]
+    let gameNumber = titleArr[1].slice(1)
+    let score = titleArr[2].charAt(0)
+    if (score == 'X') score = 0
+    let answerArr = fullArr.slice(1, fullArr.length - 1)
+    let date = convertDate('costcodle', parseInt(gameNumber))
 
     return {
         score: score,
         game: 'costcodle',
-        date: gameNumber,
+        date: date,
+        gameNumber: gameNumber,
         graph: answerArr,
         misc: null,
-        link: null
+        link: null,
+        slug: 'costcodle:' + date
     }
 }
 
@@ -269,16 +315,19 @@ function parseCine2Nerdle(text) {
     let titleArr = fullArr[0]
 
     let gameNumber = titleArr.split(' ')[1].slice(1)
+    let date = convertDate('cine2nerdle', parseInt(gameNumber))
     let score = fullArr[6].split(' ')[2]
     let answerArr = fullArr.slice(1, 5)
 
     return {
         score: score,
         game: 'cine2nerdle',
-        date: gameNumber,
+        date: date,
+        gameNumber: gameNumber,
         graph: answerArr,
         misc: null,
-        link: null
+        link: 'www.cine2nerdle.app/puzzles/original/' + gameNumber,
+        slug: 'cine2nerdle:' + date
     }
 }
 
@@ -286,60 +335,71 @@ function parseDozen(text) {
     let fullArr = text.split(`\n`)
 
     let gameNumber = fullArr[1].split(' ')[1]
-    let score = fullArr[3].split(' ')[2]
+    let date = convertDate('dozen', parseInt(gameNumber))
+    let score = fullArr[3].split(' ')[1]
     let answerArr = fullArr.slice(4, 7)
     let misc = fullArr[7]
 
     return {
         score: score,
         game: 'dozen',
-        date: gameNumber,
+        date: date,
+        gameNumber: gameNumber,
         graph: answerArr,
         misc: misc,
-        link: null
+        link: null,
+        slug: 'dozen:' + date
     }
 }
 
 function convertDate(game, text) {
+    let date = null
+
     if (game == 'wordle') {
-        let date = new Date('2021-06-21')
-        date.setDate(date + text)
+        date = new Date('2021-06-21')
+        date.setDate(date.getDate() + text)
     } else if (game == 'connections') {
-        let date = new Date('2023-06-12')
-        date.setDate(date + text)
+        date = new Date('2023-06-12')
+        date.setDate(date.getDate() + text)
     } else if (game == 'immaculate_footy') {
-        let date = new Date('2023-08-19')
-        date.setDate(date + text)
+        date = new Date('2023-08-19')
+        date.setDate(date.getDate() + text)
     } else if (game == 'immaculate_basketball_mens') {
-        let date = new Date('2023-07-26')
-        date.setDate(date + text)
+        date = new Date('2023-07-26')
+        date.setDate(date.getDate() + text)
     } else if (game == 'immaculate_basketball_womens') {
-        let date = new Date('2023-08-14')
-        date.setDate(date + text)
+        date = new Date('2023-08-14')
+        date.setDate(date.getDate() + text)
     } else if (game == 'immaculate_baseball') {
-        let date = new Date('2023-04-04')
-        date.setDate(date + text)
+        date = new Date('2023-04-04')
+        date.setDate(date.getDate() + text)
     } else if (game == 'immaculate_football') {
-        let date = new Date('2023-07-20')
-        date.setDate(date + text)
+        date = new Date('2023-07-20')
+        date.setDate(date.getDate() + text)
     } else if (game == 'immaculate_hockey') {
-        let date = new Date('2023-07-27')
-        date.setDate(date + text)
+        date = new Date('2023-07-27')
+        date.setDate(date.getDate() + text)
     } else if (game == 'tradle') {
-        let date = new Date('2022-03-07')
-        date.setDate(date + text)
+        date = new Date('2022-03-07')
+        date.setDate(date.getDate() + text)
     } else if (game == 'globle') {
-        let date = new Date(text)
+        date = new Date(text)
     } else if (game == 'pokedoku') {
-        let date = new Date(text)
+        date = new Date(text)
     } else if (game == 'costcodle') {
-        let date = new Date('2023-09-21')
-        date.setDate(date + text)
+        date = new Date('2023-09-21')
+        date.setDate(date.getDate() + text)
     } else if (game == 'cine2nerdle') {
-        let date = new Date('2022-11-03')
-        date.setDate(date + text)
+        date = new Date('2022-11-03')
+        date.setDate(date.getDate() + text)
     } else if (game == 'dozen') {
-        let date = new Date('2023-07-24')
-        date.setDate(date + text)
+        date = new Date('2023-07-24')
+        date.setDate(date.getDate() + text)
     }
+
+    return date.getUTCFullYear() + '-' + pad(date.getUTCMonth() + 1) + '-' + pad(date.toDateString().slice(8, 10))
 }
+
+function pad(num) {
+    return ('00' + num).slice(-2)
+};

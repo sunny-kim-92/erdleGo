@@ -5,7 +5,6 @@ import './Popup.css'
 
 export const Popup = ({ testCount }) => {
   const [count, setCount] = useState(testCount || 0)
-  const link = 'https://github.com/guocaoyi/create-chrome-ext'
   const {
     register,
     formState: { errors },
