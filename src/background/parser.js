@@ -356,7 +356,7 @@ function convertDate(game, text) {
     let date = null
 
     if (game == 'wordle') {
-        date = new Date('2021-06-21')
+        date = new Date('2021-06-20')
         date.setDate(date.getDate() + text)
     } else if (game == 'connections') {
         date = new Date('2023-06-12')
