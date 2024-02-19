@@ -54,17 +54,23 @@ function insertScore(obj) {
         const requestUpdate = scoreObjectStore.put(obj);
         requestUpdate.onerror = (event) => {
           console.log('Error')
+          chrome.runtime.sendMessage({type: 'scoreSavedError'})
         };
         requestUpdate.onsuccess = async (event) => {
-          console.log('saved')
-          chrome.runtime.sendMessage({type: 'scoreSaved', score: obj})
+          console.log('Saved')
+          chrome.runtime.sendMessage({type: 'scoreSavedSuccess', score: obj})
         };
       }
+
+    request.onerror = (e) => {
+      console.log('Error')
+      chrome.runtime.sendMessage({type: 'scoreSavedError'})
+    }
   };
 }
 
 function getList() {
-  console.log('start getList')
+  console.log('in get list')
   const arr = []
   let db;
   const dbRequest = indexedDB.open('database');
@@ -87,13 +93,12 @@ function getList() {
     request.onsuccess = (e) => {
       const cursor = e.target.result
       if (cursor) {
-        console.log(cursor.key)
         if (cursor.key == dateString) {
-          console.log(cursor.value)
           arr.push(cursor.value)
         }
         cursor.continue()
       }
+      console.log('hi')
       chrome.runtime.sendMessage({ type: 'updateList', list: arr })
     }
   };

@@ -1,6 +1,8 @@
 // Helpers
 export function parseScore(text) {
+    console.log(text)
     let data = null
+    
     if (text.indexOf('Wordle') != -1) {
         data = parseWordle(text)
     } else if (text.indexOf('Connections') != -1) {
@@ -45,10 +47,10 @@ export function parseScore(text) {
 function parseWordle(text) {
     let fullArr = text.split(`\n`)
     let titleArr = fullArr[0].split(' ')
-
     let gameNumber = titleArr[1]
     let answerArr = fullArr.slice(2)
-    let score = answerArr.length
+    let score = titleArr[2].split('/')[0]
+    if(score == 'X') score = 0
     let date = convertDate('wordle', parseInt(gameNumber))
 
     return {

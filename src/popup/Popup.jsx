@@ -5,7 +5,8 @@ import './Popup.css'
 
 export const Popup = () => {
   const [scoresList, setScoresList] = useState([])
-  const [error, setError] = useState('')
+  const [defaultGames, setDefaultGames] = useState([])
+  const [saveError, setSaveError] = useState('')
   const {
     register,
     formState: { errors },
@@ -23,11 +24,36 @@ export const Popup = () => {
   };
 
   async function fetchData() {
-    const res = await chrome.runtime.sendMessage({ type: 'getList' })
-    const defaultGames = await chrome.storage.sync.get('defaultGames')
-
-
+    const defaultList = await chrome.storage.sync.get(['lastUpdated', 'defaultGames'])
+    const todayString = getTodayDateString()
+    console.log(defaultList)
+    if (defaultList.lastUpdated != todayString) {
+      const res = await chrome.runtime.sendMessage({ type: 'getList' })
+      await chrome.storage.sync.set({ 'lastUpdated': todayString })
+    } else {
+      const defaultGamesArr = []
+      for (let game in defaultList.defaultGames) {
+        if (defaultList.defaultGames[game]) {
+          defaultGamesArr.push({
+            'game': game,
+            'score': scoresList[game] || null
+          })
+        }
+      }
+      setDefaultGames([...defaultGamesArr])
+    }
   }
+
+  function getTodayDateString() {
+    function pad(text) {
+      return ('00' + text).slice(-2)
+    }
+
+    const today = new Date()
+    const todayString = today.getUTCFullYear() + '-' + pad(today.getUTCMonth() + 1) + '-' + pad(today.toDateString().slice(8, 10))
+
+    return todayString
+  };
 
   function toDisplayString(text) {
     let arr = text.split('_')
@@ -44,25 +70,50 @@ export const Popup = () => {
 
   chrome.runtime.onMessage.addListener((request) => {
     if (request.type == 'updateList') {
-      setScoresList([...request.list])
-      console.log(request.list)
-    } else if (request.type == 'scoreSaved') {
-      console.log(request.score)
+      const gameList = defaultGames
+      console.log('got update')
+      request.list.forEach((score) => {
+        gameList.forEach((defaultGame) => {
+          let camelCased = score.game.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
+          if (camelCased == defaultGame.game) {
+            defaultGame.score = score.score
+          }
+        })
+      })
+      setDefaultGames([...gameList])
+    } else if (request.type == 'scoreSavedSuccess') {
+      const todayDate = getTodayDateString()
+      if (request.score.date == todayDate) {
+        const gameList = defaultGames
+        gameList.forEach((game) => {
+          if (game.game == request.score.game) {
+            game.score = request.score.score
+          }
+        })
+        setDefaultGames([...gameList])
+      }
+    } else if (request.type == 'scoreSavedError') {
+      setSaveError('Could not read score.')
+      setTimeout(() => {
+        setSaveError('')
+      }, 3000)
     }
   })
 
   return (
     <main>
-      <table>
-        <tbody>
-          {scoresList.map((score) => {
-            return <tr key={score.slug}>
-              <td>{toDisplayString(score.game)}</td>
-              <td>{score.score}</td>
-            </tr>
-          })}
-        </tbody>
-      </table>
+      <div>
+        <table style={{ margin: 'auto', borderSpacing: '20px 5px' }}>
+          <tbody>
+            {defaultGames.map((score, i) => {
+              return <tr key={i}>
+                <td style={{ textAlign: 'start' }}>{toDisplayString(score.game)}</td>
+                <td style={{ textAlign: 'start' }}>{score.score}</td>
+              </tr>
+            })}
+          </tbody>
+        </table>
+      </div>
       <form onSubmit={handleSubmit(onSubmit)}>
         <textarea
           // onKeyUp={handleUserKeyPress}
@@ -71,6 +122,10 @@ export const Popup = () => {
         {errors.text?.type === "required" && (
           <p role="alert">Text is required</p>
         )}
+        {saveError && (
+          <p role="alert">{saveError}</p>
+        )}
+        <br />
         <button onClick={handleSubmit(onSubmit)}>Submit</button>
       </form>
     </main>
