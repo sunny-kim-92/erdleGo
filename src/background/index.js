@@ -54,23 +54,22 @@ function insertScore(obj) {
         const requestUpdate = scoreObjectStore.put(obj);
         requestUpdate.onerror = (event) => {
           console.log('Error')
-          chrome.runtime.sendMessage({type: 'scoreSavedError'})
+          chrome.runtime.sendMessage({ type: 'scoreSavedError' })
         };
         requestUpdate.onsuccess = async (event) => {
           console.log('Saved')
-          chrome.runtime.sendMessage({type: 'scoreSavedSuccess', score: obj})
+          chrome.runtime.sendMessage({ type: 'scoreSavedSuccess', score: obj })
         };
       }
 
     request.onerror = (e) => {
       console.log('Error')
-      chrome.runtime.sendMessage({type: 'scoreSavedError'})
+      chrome.runtime.sendMessage({ type: 'scoreSavedError' })
     }
   };
 }
 
-function getList() {
-  console.log('in get list')
+function refreshScoresList() {
   const arr = []
   let db;
   const dbRequest = indexedDB.open('database');
@@ -90,7 +89,7 @@ function getList() {
 
     //Find existing record if applicable
     const request = scoreObjectStore
-    request.onsuccess = (e) => {
+    request.onsuccess = async (e) => {
       const cursor = e.target.result
       if (cursor) {
         if (cursor.key == dateString) {
@@ -98,8 +97,27 @@ function getList() {
         }
         cursor.continue()
       }
-      console.log('hi')
-      chrome.runtime.sendMessage({ type: 'updateList', list: arr })
+      let defaultGames = await chrome.storage.sync.get('defaultGames')
+      defaultGames = defaultGames.defaultGames
+      let gamesList = []
+      for (let game in defaultGames) {
+        if (defaultGames[game]) {
+          let gameObj = {
+            game: game,
+            score: 0
+          }
+          arr.forEach((score) => {
+            let camelCased = score.game.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
+            if (game == camelCased) {
+              gameObj.score = score.score
+            }
+          })
+          gamesList.push(gameObj)
+        }
+      }
+      console.log(gamesList)
+      await chrome.storage.sync.set({ 'scoresList': gamesList })
+      await chrome.runtime.sendMessage({ type: 'scoresListRefreshed', list: gamesList })
     }
   };
 }
@@ -110,9 +128,10 @@ chrome.runtime.onMessage.addListener((request) => {
     calculateScore(request.data.text)
   }
 
-  if (request.type === 'getList') {
-    getList()
+  if (request.type == 'refreshScoresList') {
+    refreshScoresList()
   }
+
   return true
 })
 

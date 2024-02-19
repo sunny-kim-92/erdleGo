@@ -24,112 +24,116 @@ export const Popup = () => {
   };
 
   async function fetchData() {
-    const defaultList = await chrome.storage.sync.get(['lastUpdated', 'defaultGames'])
+    const defaultList = await chrome.storage.sync.get(['lastUpdated', 'defaultGames', 'scoresList'])
     const todayString = getTodayDateString()
-    console.log(defaultList)
-    if (defaultList.lastUpdated != todayString) {
-      const res = await chrome.runtime.sendMessage({ type: 'getList' })
-      await chrome.storage.sync.set({ 'lastUpdated': todayString })
-    } else {
-      const defaultGamesArr = []
-      for (let game in defaultList.defaultGames) {
-        if (defaultList.defaultGames[game]) {
-          defaultGamesArr.push({
-            'game': game,
-            'score': scoresList[game] || null
-          })
-        }
-      }
-      setDefaultGames([...defaultGamesArr])
-    }
+    // if (defaultList.lastUpdated != todayString) {
+    const res = await chrome.runtime.sendMessage({ type: 'refreshScoresList' })
+    // await chrome.storage.sync.set({ 'lastUpdated': todayString })
+    // } else {
+    // setScoresList(defaultList.scoresList)
+    // const defaultGamesArr = []
+    // for (let game in defaultList.defaultGames) {
+    //   if (defaultList.defaultGames[game]) {
+    //     defaultGamesArr.push({
+    //       'game': game,
+    //       'score': scoresList[game] || null
+    //     })
+    //   }
+    // }
+    // setDefaultGames([...defaultGamesArr])
   }
 
-  function getTodayDateString() {
-    function pad(text) {
-      return ('00' + text).slice(-2)
-    }
-
-    const today = new Date()
-    const todayString = today.getUTCFullYear() + '-' + pad(today.getUTCMonth() + 1) + '-' + pad(today.toDateString().slice(8, 10))
-
-    return todayString
-  };
-
-  function toDisplayString(text) {
-    let arr = text.split('_')
-    let final = []
-    arr.forEach((word) => {
-      final.push(word.charAt(0).toUpperCase() + word.slice(1))
-    })
-    return final.join(' ')
+function getTodayDateString() {
+  function pad(text) {
+    return ('00' + text).slice(-2)
   }
 
-  useEffect(() => {
-    fetchData()
-  }, [])
+  const today = new Date()
+  const todayString = today.getUTCFullYear() + '-' + pad(today.getUTCMonth() + 1) + '-' + pad(today.toDateString().slice(8, 10))
 
-  chrome.runtime.onMessage.addListener((request) => {
-    if (request.type == 'updateList') {
-      const gameList = defaultGames
-      console.log('got update')
-      request.list.forEach((score) => {
-        gameList.forEach((defaultGame) => {
-          let camelCased = score.game.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
-          if (camelCased == defaultGame.game) {
-            defaultGame.score = score.score
-          }
-        })
-      })
-      setDefaultGames([...gameList])
-    } else if (request.type == 'scoreSavedSuccess') {
-      const todayDate = getTodayDateString()
-      if (request.score.date == todayDate) {
-        const gameList = defaultGames
-        gameList.forEach((game) => {
-          if (game.game == request.score.game) {
-            game.score = request.score.score
-          }
-        })
-        setDefaultGames([...gameList])
-      }
-    } else if (request.type == 'scoreSavedError') {
-      setSaveError('Could not read score.')
-      setTimeout(() => {
-        setSaveError('')
-      }, 3000)
-    }
+  return todayString
+};
+
+function toDisplayString(text) {
+  let arr = text.split('_')
+  let final = []
+  arr.forEach((word) => {
+    final.push(word.charAt(0).toUpperCase() + word.slice(1))
   })
+  return final.join(' ')
+}
 
-  return (
-    <main>
-      <div>
-        <table style={{ margin: 'auto', borderSpacing: '20px 5px' }}>
-          <tbody>
-            {defaultGames.map((score, i) => {
-              return <tr key={i}>
-                <td style={{ textAlign: 'start' }}>{toDisplayString(score.game)}</td>
-                <td style={{ textAlign: 'start' }}>{score.score}</td>
-              </tr>
-            })}
-          </tbody>
-        </table>
-      </div>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <textarea
-          // onKeyUp={handleUserKeyPress}
-          {...register("text", { required: true })}
-        />
-        {errors.text?.type === "required" && (
-          <p role="alert">Text is required</p>
-        )}
-        {saveError && (
-          <p role="alert">{saveError}</p>
-        )}
-        <br />
-        <button onClick={handleSubmit(onSubmit)}>Submit</button>
-      </form>
-    </main>
-  )
+useEffect(() => {
+  fetchData()
+}, [])
+
+chrome.runtime.onMessage.addListener(async (request) => {
+  if (request.type == 'scoresListRefreshed') {
+    setScoresList(request.list)
+  }
+  if (request.type == 'updateList') {
+    const gameList = defaultGames
+    console.log('got update')
+    request.list.forEach((score) => {
+      gameList.forEach((defaultGame) => {
+        let camelCased = score.game.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
+        if (camelCased == defaultGame.game) {
+          defaultGame.score = score.score
+        }
+      })
+    })
+    setDefaultGames([...gameList])
+  } else if (request.type == 'scoreSavedSuccess') {
+    const todayDate = getTodayDateString()
+    if (request.score.date == todayDate) {
+      let scores = await chrome.storage.sync.get('scoresList')
+      scores = scores.scoresList
+      // const gameList = defaultGames
+      scores.forEach((game) => {
+        if (game.game == request.score.game) {
+          game.score = request.score.score
+        }
+      })
+      setScoresList([...scores])
+    }
+  } else if (request.type == 'scoreSavedError') {
+    setSaveError('Could not read score.')
+    setTimeout(() => {
+      setSaveError('')
+    }, 3000)
+  }
+})
+
+return (
+  <main>
+    <div>
+      <table style={{ margin: 'auto', borderSpacing: '20px 5px' }}>
+        <tbody>
+          {scoresList.map((score, i) => {
+            return <tr key={i}>
+              <td style={{ textAlign: 'start' }}>{toDisplayString(score.game)}</td>
+              <td style={{ textAlign: 'start' }}>{score.score}</td>
+            </tr>
+          })}
+        </tbody>
+      </table>
+    </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <textarea
+        // onKeyUp={handleUserKeyPress}
+        {...register("text", { required: true })}
+      />
+      {errors.text?.type === "required" && (
+        <p role="alert">Text is required</p>
+      )}
+      {saveError && (
+        <p role="alert">{saveError}</p>
+      )}
+      <br />
+      <button onClick={handleSubmit(onSubmit)}>Submit</button>
+    </form>
+  </main>
+)
 }
 
 export default Popup
