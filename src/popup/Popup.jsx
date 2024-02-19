@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form"
 import './Popup.css'
 
 export const Popup = () => {
-  const [list, setList] = useState([])
+  const [scoresList, setScoresList] = useState([])
   const [error, setError] = useState('')
   const {
     register,
@@ -24,9 +24,12 @@ export const Popup = () => {
 
   async function fetchData() {
     const res = await chrome.runtime.sendMessage({ type: 'getList' })
+    const defaultGames = await chrome.storage.sync.get('defaultGames')
+
+
   }
 
-  function toDisplayString(text){
+  function toDisplayString(text) {
     let arr = text.split('_')
     let final = []
     arr.forEach((word) => {
@@ -41,7 +44,7 @@ export const Popup = () => {
 
   chrome.runtime.onMessage.addListener((request) => {
     if (request.type == 'updateList') {
-      setList([...request.list])
+      setScoresList([...request.list])
       console.log(request.list)
     } else if (request.type == 'scoreSaved') {
       console.log(request.score)
@@ -51,12 +54,14 @@ export const Popup = () => {
   return (
     <main>
       <table>
-        {list.map((score) => {
-          return <tr key={score.slug}>
-            <td>{toDisplayString(score.game)}</td>
-            <td>{score.score}</td>
-          </tr>
-        })}
+        <tbody>
+          {scoresList.map((score) => {
+            return <tr key={score.slug}>
+              <td>{toDisplayString(score.game)}</td>
+              <td>{score.score}</td>
+            </tr>
+          })}
+        </tbody>
       </table>
       <form onSubmit={handleSubmit(onSubmit)}>
         <textarea
