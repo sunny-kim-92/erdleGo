@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Frequency } from './Frequency'
 
 import './Options.css'
 
@@ -71,6 +72,7 @@ export const Options = () => {
   const [immaculateBasketballMens, setImmaculateBasketballMens] = useState(false)
   const [immaculateBasketballWomens, setImmaculateBasketballWomens] = useState(false)
   const [connections, setConnections] = useState(false)
+  const [chartData, setChartData] = useState([])
 
   const onSubmit = () => {
     chrome.storage.sync.set({
@@ -95,8 +97,8 @@ export const Options = () => {
   }
 
   useEffect(() => {
+    chrome.runtime.sendMessage({ type: 'getChartData' })
     chrome.storage.sync.get(['defaultGames'], (result) => {
-      console.log(result.defaultGames || false)
       setWordle(result.defaultGames.wordle || false)
       setDozen(result.defaultGames.dozen || false)
       setCine2Nerdle(result.defaultGames.Cine2Nerdle || false)
@@ -113,9 +115,17 @@ export const Options = () => {
     })
   }, [])
 
+  // Chrome Listener
+  chrome.runtime.onMessage.addListener(async (request) => {
+    if (request.type == 'chartDataRefreshed') {
+      setChartData(request.chartData)
+    }
+  })
+
   return (
     <main>
       <h3>Options Page</h3>
+      <Frequency/>
       <table>
         <tbody>
           <tr key={'wordle'}>

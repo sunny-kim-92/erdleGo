@@ -69,6 +69,7 @@ export const Popup = () => {
     fetchData()
   }, [])
 
+  // Chrome Listener
   chrome.runtime.onMessage.addListener(async (request) => {
     if (request.type == 'scoresListRefreshed') {
       setScoresList(request.list)

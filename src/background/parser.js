@@ -1,6 +1,5 @@
 // Helpers
 export function parseScore(text) {
-    console.log(text)
     let data = null
 
     if (text.indexOf('Wordle') != -1) {
@@ -110,7 +109,7 @@ function parseImmaculateFooty(text) {
     let score = titleArr[4].charAt(0)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
-    let date = convertDate('immaculate_footy', parseInt(gameNumber))
+    let date = convertDate('immaculateFooty', parseInt(gameNumber))
 
     if (!gameNumber
         || !date
@@ -120,13 +119,13 @@ function parseImmaculateFooty(text) {
 
     return {
         score: score,
-        game: 'immaculate_footy',
+        game: 'immaculateFooty',
         gameNumber: gameNumber,
         date: date,
         graph: answerArr,
         misc: rarity,
         link: link,
-        slug: 'immaculate_footy:' + date
+        slug: 'immaculateFooty:' + date
     }
 }
 
@@ -139,7 +138,7 @@ function parseImmaculateBasketballMens(text) {
     let answerArr = fullArr.slice(3, 6)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
-    let date = convertDate('immaculate_basketball_mens', parseInt(gameNumber))
+    let date = convertDate('immaculateBasketballMens', parseInt(gameNumber))
 
     if (!gameNumber
         || !date
@@ -149,13 +148,13 @@ function parseImmaculateBasketballMens(text) {
 
     return {
         score: score,
-        game: 'immaculate_basketball_mens',
+        game: 'immaculateBasketballMens',
         gameNumber: gameNumber,
         date: date,
         graph: answerArr,
         misc: rarity,
         link: link,
-        slug: 'immaculate_basketball_mens:' + date
+        slug: 'immaculateBasketballMens:' + date
     }
 }
 
@@ -168,7 +167,7 @@ function parseImmaculateBasketballWomens(text) {
     let answerArr = fullArr.slice(3, 6)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
-    let date = convertDate('immaculate_basketball_womens', parseInt(gameNumber))
+    let date = convertDate('immaculateBasketballWomens', parseInt(gameNumber))
 
     if (!gameNumber
         || !date
@@ -178,13 +177,13 @@ function parseImmaculateBasketballWomens(text) {
 
     return {
         score: score,
-        game: 'immaculate_basketball_womens',
+        game: 'immaculateBasketballWomens',
         date: date,
         gameNumber: gameNumber,
         graph: answerArr,
         misc: rarity,
         link: link,
-        slug: 'immaculate_basketball_womens:' + date
+        slug: 'immaculateBasketballWomens:' + date
     }
 }
 
@@ -197,7 +196,7 @@ function parseImmaculateBaseball(text) {
     let answerArr = fullArr.slice(3, 6)
     let rarity = fullArr[2].split(' ')[1]
     let link = fullArr[7]
-    let date = convertDate('immaculate_baseball', parseInt(gameNumber))
+    let date = convertDate('immaculateBaseball', parseInt(gameNumber))
 
     if (!gameNumber
         || !date
@@ -207,13 +206,13 @@ function parseImmaculateBaseball(text) {
 
     return {
         score: score,
-        game: 'immaculate_baseball',
+        game: 'immaculateBaseball',
         date: date,
         gameNumber: gameNumber,
         graph: answerArr,
         misc: rarity,
         link: link,
-        slug: 'immaculate_baseball:' + date
+        slug: 'immaculateBaseball:' + date
     }
 }
 
@@ -226,7 +225,7 @@ function parseImmaculateFootball(text) {
     let answerArr = fullArr.slice(2, 5)
     let rarity = fullArr[1].split(' ')[1]
     let link = fullArr[6]
-    let date = convertDate('immaculate_football', parseInt(gameNumber))
+    let date = convertDate('immaculateFootball', parseInt(gameNumber))
 
     if (!gameNumber
         || !date
@@ -236,13 +235,13 @@ function parseImmaculateFootball(text) {
 
     return {
         score: score,
-        game: 'immaculate_football',
+        game: 'immaculateFootball',
         gameNumber: gameNumber,
         date: date,
         graph: answerArr,
         misc: rarity,
         link: link,
-        slug: 'immaculate_football:' + date
+        slug: 'immaculateFootball:' + date
     }
 }
 
@@ -255,7 +254,7 @@ function parseImmaculateHockey(text) {
     let answerArr = fullArr.slice(2, 5)
     let rarity = fullArr[1].split(' ')[1]
     let link = fullArr[6]
-    let date = convertDate('immaculate_hockey', parseInt(gameNumber))
+    let date = convertDate('immaculateHockey', parseInt(gameNumber))
 
     if (!gameNumber
         || !date
@@ -265,13 +264,13 @@ function parseImmaculateHockey(text) {
 
     return {
         score: score,
-        game: 'immaculate_hockey',
+        game: 'immaculateHockey',
         gameNumber: gameNumber,
         date: date,
         graph: answerArr,
         misc: rarity,
         link: link,
-        slug: 'immaculate_hockey:' + date
+        slug: 'immaculateHockey:' + date
     }
 }
 
@@ -391,7 +390,7 @@ function parseCine2Nerdle(text) {
     let titleArr = fullArr[0]
 
     let gameNumber = titleArr.split(' ')[1].slice(1)
-    let date = convertDate('cine2nerdle', parseInt(gameNumber))
+    let date = convertDate('cine2Nerdle', parseInt(gameNumber))
     let score = fullArr[6].split(' ')[2]
     let answerArr = fullArr.slice(1, 5)
 
@@ -403,13 +402,13 @@ function parseCine2Nerdle(text) {
 
     return {
         score: score,
-        game: 'cine2nerdle',
+        game: 'cine2Nerdle',
         date: date,
         gameNumber: gameNumber,
         graph: answerArr,
         misc: null,
         link: 'www.cine2nerdle.app/puzzles/original/' + gameNumber,
-        slug: 'cine2nerdle:' + date
+        slug: 'cine2Nerdle:' + date
     }
 }
 
@@ -449,22 +448,22 @@ function convertDate(game, text) {
     } else if (game == 'connections') {
         date = new Date('2023-06-12')
         date.setDate(date.getDate() + text)
-    } else if (game == 'immaculate_footy') {
+    } else if (game == 'immaculateFooty') {
         date = new Date('2023-08-19')
         date.setDate(date.getDate() + text)
-    } else if (game == 'immaculate_basketball_mens') {
+    } else if (game == 'immaculateBasketballMens') {
         date = new Date('2023-07-26')
         date.setDate(date.getDate() + text)
-    } else if (game == 'immaculate_basketball_womens') {
+    } else if (game == 'immaculateBasketballWomens') {
         date = new Date('2023-08-14')
         date.setDate(date.getDate() + text)
-    } else if (game == 'immaculate_baseball') {
+    } else if (game == 'immaculateBaseball') {
         date = new Date('2023-04-04')
         date.setDate(date.getDate() + text)
-    } else if (game == 'immaculate_football') {
+    } else if (game == 'immaculateFootball') {
         date = new Date('2023-07-20')
         date.setDate(date.getDate() + text)
-    } else if (game == 'immaculate_hockey') {
+    } else if (game == 'immaculateHockey') {
         date = new Date('2023-07-27')
         date.setDate(date.getDate() + text)
     } else if (game == 'tradle') {
@@ -477,7 +476,7 @@ function convertDate(game, text) {
     } else if (game == 'costcodle') {
         date = new Date('2023-09-21')
         date.setDate(date.getDate() + text)
-    } else if (game == 'cine2nerdle') {
+    } else if (game == 'cine2Nerdle') {
         date = new Date('2022-11-03')
         date.setDate(date.getDate() + text)
     } else if (game == 'dozen') {

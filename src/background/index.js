@@ -1,5 +1,6 @@
 import { parseScore } from './parser.js'
 
+// Boilerplate for asynchronous handling
 if ('crbug.com/1185241') {
   const { onMessage } = chrome.runtime, { addListener } = onMessage;
   onMessage.addListener = fn => addListener.call(onMessage, (msg, sender, respond) => {
@@ -8,6 +9,7 @@ if ('crbug.com/1185241') {
     if (res !== undefined) respond(res);
   });
 }
+
 // Launch IndexedDB
 let db;
 const dbRequest = indexedDB.open('database');
@@ -28,6 +30,7 @@ dbRequest.onupgradeneeded = (event) => {
 
 
 // Helpers
+// Calculate score, simply calls insertScore
 function calculateScore(text) {
   let res = parseScore(text)
   if (res != 'Error') {
@@ -37,6 +40,7 @@ function calculateScore(text) {
   }
 }
 
+// Find score and save/update entry
 function insertScore(obj) {
   let db;
   const dbRequest = indexedDB.open('database');
@@ -71,6 +75,7 @@ function insertScore(obj) {
   };
 }
 
+// Return list of current scores for popup
 function refreshScoresList() {
   const arr = []
   let db;
@@ -123,6 +128,42 @@ function refreshScoresList() {
   };
 }
 
+function getChartData(game, startDate, endDate) {
+  let start = new Date()
+  start.setMonth(start.getMonth() - 1)
+  start = getDateString(start)
+  let end = new Date()
+  end = getDateString(end)
+  let range = IDBKeyRange.bound(start, end)
+
+  let db;
+  const dbRequest = indexedDB.open('database');
+  dbRequest.onerror = (event) => {
+    console.error('error');
+  };
+  dbRequest.onsuccess = async (event) => {
+    db = event.target.result;
+    const resultStore = db
+      .transaction('scores', 'readonly')
+      .objectStore('scores')
+      .index('date')
+      .openCursor(range)
+
+
+    resultStore.onsuccess = async (e) => {
+      let results = []
+      const cursor = e.target.result
+      if (cursor) {
+        results.push(cursor.value)
+        cursor.continue()
+      }
+      if (results.length) {
+        await chrome.runtime.sendMessage({ type: 'chartDataRefreshed', chartData: results })
+      }
+    }
+  }
+}
+
 // Listener
 chrome.runtime.onMessage.addListener((request) => {
   if (request.type === 'addScore') {
@@ -131,10 +172,16 @@ chrome.runtime.onMessage.addListener((request) => {
 
   if (request.type == 'refreshScoresList') {
     refreshScoresList()
+  } if (request.type == 'getChartData') {
+    getChartData()
   }
 
   return true
 })
+
+function getDateString(date) {
+  return date.getUTCFullYear() + '-' + pad(date.getUTCMonth() + 1) + '-' + pad(date.toDateString().slice(8, 10))
+}
 
 function pad(num) {
   return ('00' + num).slice(-2)
