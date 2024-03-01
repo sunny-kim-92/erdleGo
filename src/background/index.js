@@ -32,6 +32,8 @@ function calculateScore(text) {
   let res = parseScore(text)
   if (res != 'Error') {
     insertScore(res)
+  } else {
+    chrome.runtime.sendMessage({ type: 'scoreSavedError' })
   }
 }
 
@@ -104,7 +106,7 @@ function refreshScoresList() {
         if (defaultGames[game]) {
           let gameObj = {
             game: game,
-            score: 0
+            score: null
           }
           arr.forEach((score) => {
             let camelCased = score.game.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
@@ -115,7 +117,6 @@ function refreshScoresList() {
           gamesList.push(gameObj)
         }
       }
-      console.log(gamesList)
       await chrome.storage.sync.set({ 'scoresList': gamesList })
       await chrome.runtime.sendMessage({ type: 'scoresListRefreshed', list: gamesList })
     }

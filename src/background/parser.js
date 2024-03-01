@@ -2,7 +2,7 @@
 export function parseScore(text) {
     console.log(text)
     let data = null
-    
+
     if (text.indexOf('Wordle') != -1) {
         data = parseWordle(text)
     } else if (text.indexOf('Connections') != -1) {
@@ -32,7 +32,10 @@ export function parseScore(text) {
     } else if (text.indexOf('DailyDozenTrivia.com') != -1) {
         data = parseDozen(text)
     } else {
-        return 'error'
+        return 'Error'
+    }
+    if (data == 'Error') {
+        return 'Error'
     }
     if (data.score) {
         data.score = parseInt(data.score)
@@ -50,8 +53,14 @@ function parseWordle(text) {
     let gameNumber = titleArr[1]
     let answerArr = fullArr.slice(2)
     let score = titleArr[2].split('/')[0]
-    if(score == 'X') score = 0
+    if (score == 'X') score = 0
     let date = convertDate('wordle', parseInt(gameNumber))
+
+    if (!gameNumber
+        || !answerArr
+        || !date) {
+        return 'Error'
+    }
 
     return {
         score: score,
@@ -73,6 +82,12 @@ function parseConnections(text) {
     let answerArr = fullArr.slice(2)
     let score = answerArr.length
     let date = convertDate('connections', parseInt(gameNumber))
+
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
 
     return {
         score: score,
@@ -97,6 +112,12 @@ function parseImmaculateFooty(text) {
     let link = fullArr[7]
     let date = convertDate('immaculate_footy', parseInt(gameNumber))
 
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
+
     return {
         score: score,
         game: 'immaculate_footy',
@@ -120,6 +141,11 @@ function parseImmaculateBasketballMens(text) {
     let link = fullArr[7]
     let date = convertDate('immaculate_basketball_mens', parseInt(gameNumber))
 
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
 
     return {
         score: score,
@@ -144,6 +170,12 @@ function parseImmaculateBasketballWomens(text) {
     let link = fullArr[7]
     let date = convertDate('immaculate_basketball_womens', parseInt(gameNumber))
 
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
+
     return {
         score: score,
         game: 'immaculate_basketball_womens',
@@ -167,6 +199,11 @@ function parseImmaculateBaseball(text) {
     let link = fullArr[7]
     let date = convertDate('immaculate_baseball', parseInt(gameNumber))
 
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
 
     return {
         score: score,
@@ -191,6 +228,12 @@ function parseImmaculateFootball(text) {
     let link = fullArr[6]
     let date = convertDate('immaculate_football', parseInt(gameNumber))
 
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
+
     return {
         score: score,
         game: 'immaculate_football',
@@ -214,6 +257,11 @@ function parseImmaculateHockey(text) {
     let link = fullArr[6]
     let date = convertDate('immaculate_hockey', parseInt(gameNumber))
 
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
 
     return {
         score: score,
@@ -238,6 +286,13 @@ function parseTradle(text) {
     let link = fullArr[fullArr.length - 1]
     let date = convertDate('tradle', parseInt(gameNumber))
 
+    if (!gameNumber
+        || !date
+        || !answerArr
+        || !link) {
+        return 'Error'
+    }
+
     return {
         score: score,
         game: 'tradle',
@@ -259,6 +314,13 @@ function parseGloble(text) {
     let answerArr = fullArr[2].split(' ')[0]
     let link = fullArr[4]
 
+    if (!gameNumber
+        || !date
+        || !answerArr
+        || !link) {
+        return 'Error'
+    }
+
     return {
         score: score,
         game: 'globle',
@@ -278,6 +340,12 @@ function parsePokedoku(text) {
     let answerArr = fullArr.slice(6, 9)
     let rarity = fullArr[4].split(' ')[1].split('/')[0]
     let link = 'https://pokedoku.com/' + date
+
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
 
     return {
         score: score,
@@ -300,6 +368,12 @@ function parseCostcodle(text) {
     let answerArr = fullArr.slice(1, fullArr.length - 1)
     let date = convertDate('costcodle', parseInt(gameNumber))
 
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
+
     return {
         score: score,
         game: 'costcodle',
@@ -321,6 +395,12 @@ function parseCine2Nerdle(text) {
     let score = fullArr[6].split(' ')[2]
     let answerArr = fullArr.slice(1, 5)
 
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
+
     return {
         score: score,
         game: 'cine2nerdle',
@@ -341,6 +421,12 @@ function parseDozen(text) {
     let score = fullArr[3].split(' ')[1]
     let answerArr = fullArr.slice(4, 7)
     let misc = fullArr[7]
+
+    if (!gameNumber
+        || !date
+        || !answerArr) {
+        return 'Error'
+    }
 
     return {
         score: score,

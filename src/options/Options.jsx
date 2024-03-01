@@ -88,7 +88,8 @@ export const Options = () => {
         'immaculateBasketballMens': immaculateBasketballMens,
         'immaculateBasketballWomens': immaculateBasketballWomens,
         'connections': connections
-      }
+      },
+      'lastUpdated': null
     }, () => {
     })
   }
