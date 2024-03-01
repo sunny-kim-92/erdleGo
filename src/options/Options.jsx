@@ -118,14 +118,37 @@ export const Options = () => {
   // Chrome Listener
   chrome.runtime.onMessage.addListener(async (request) => {
     if (request.type == 'chartDataRefreshed') {
-      setChartData(request.chartData)
+      if (request.chartData) {
+        let scores = {
+          0: 0,
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
+          9: 0
+        }
+
+        request.chartData.forEach((game) => {
+          scores[game.score]++
+        })
+        let dataset = []
+        for (let scoreIndex in scores) {
+          dataset.push({ x: scores[scoreIndex], y: scoreIndex })
+        }
+        console.log(dataset)
+        setChartData(dataset)
+      }
     }
   })
 
   return (
     <main>
       <h3>Options Page</h3>
-      <Frequency/>
+      <Frequency chartData={chartData} />
       <table>
         <tbody>
           <tr key={'wordle'}>
